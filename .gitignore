@@ -1,0 +1,8 @@
+/bin
+/vendor
+.DS_STORE
+/.idea
+/.vscode
+
+/cover.out
+/cover.out.tmp
