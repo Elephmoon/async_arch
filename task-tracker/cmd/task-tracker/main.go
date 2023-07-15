@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"log"
-	"task-tracker/config"
+	"net/http"
+	"os"
+	"task-tracker/internal/app"
+	"task-tracker/internal/config"
 
 	"github.com/joho/godotenv"
 )
@@ -21,4 +24,11 @@ func main() {
 		log.Fatalf("cant connect to postgres %v", err)
 	}
 	defer db.Close(ctx)
+
+	service := app.SetupHTTPService()
+
+	err = http.ListenAndServe(os.Getenv(`HTTP_PORT`), service.Router)
+	if err != nil {
+		log.Fatalf("get http listen err %v", err)
+	}
 }
