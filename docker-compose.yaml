@@ -1,10 +1,28 @@
 version: '3.9'
 services:
+  db-auth:
+    image: postgres:13.6
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=auth
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - TZ='utc'
+    command: [ "-c", "log_statement=all", "-c", "log_destination=stderr" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+    networks:
+      - arch_async
+
   db-accounting:
     image: postgres:13.6
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5434:5432"
     environment:
       - POSTGRES_DB=accounting
       - POSTGRES_HOST_AUTH_METHOD=trust
@@ -15,12 +33,14 @@ services:
       interval: 1s
       timeout: 10s
       retries: 60
+    networks:
+      - arch_async
 
   db-task-tracker:
     image: postgres:13.6
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5435:5432"
     environment:
       - POSTGRES_DB=task-tracker
       - POSTGRES_HOST_AUTH_METHOD=trust
@@ -31,12 +51,14 @@ services:
       interval: 1s
       timeout: 10s
       retries: 60
+    networks:
+      - arch_async
 
   db-analytics:
     image: postgres:13.6
     restart: unless-stopped
     ports:
-      - "5434:5432"
+      - "5436:5432"
     environment:
       - POSTGRES_DB=analytics
       - POSTGRES_HOST_AUTH_METHOD=trust
@@ -47,6 +69,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 60
+    networks:
+      - arch_async
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -54,6 +78,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - arch_async
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
@@ -82,3 +108,9 @@ services:
       interval: 3s
       timeout: 5s
       retries: 20
+    networks:
+      - arch_async
+
+networks:
+  arch_async:
+    driver: bridge
