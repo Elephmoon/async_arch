@@ -1,5 +1,5 @@
 /bin
-/vendor
+vendor/
 .DS_STORE
 /.idea
 /.vscode

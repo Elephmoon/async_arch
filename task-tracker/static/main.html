@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<h1>Task manager</h1>
+<div class="container">
+    <h2>Task creation</h2>
+    <form action="/create-task" method="POST">
+        <div class="form-group">
+            <label for="jwt-token">JWT</label>
+            <input type="text" class="form-control" name="jwt-token" required placeholder="Please enter your jwt token">
+        </div>
+        <div class="form-group">
+            <label for="task-name">Task name</label>
+            <input type="text" class="form-control" name="task-name" required placeholder="Please enter task-name">
+        </div>
+        <div class="form-group">
+            <label for="task-description">Task description</label>
+            <input type="text" class="form-control" name="task-description" required placeholder="Please enter task description">
+        </div>
+        <div class="form-group">
+            <label for="assignee-username">Assignee username</label>
+            <input type="text" class="form-control" name="assignee-username" required placeholder="Please enter assignee username">
+        </div>
+        <button type="submit" class="btn btn-success">Create task</button>
+    </form>
+</div>
+/<div class="container">
+    <h2>Task shuffling</h2>
+    <form action="/shuffle-tasks" method="POST">
+        <div class="form-group">
+            <label for="jwt-token">JWT</label>
+            <input type="text" class="form-control" name="jwt-token" required placeholder="Please enter your jwt token">
+        </div>
+        <button type="submit" class="btn btn-success">Shuffle</button>
+    </form>
+</div>
+/<div class="container">
+    <h2>Task closing</h2>
+    <form action="/close-task" method="POST">
+        <div class="form-group">
+            <label for="jwt-token">JWT</label>
+            <input type="text" class="form-control" name="jwt-token" required placeholder="Please enter your jwt token">
+        </div>
+        <div class="form-group">
+            <label for="task-id">Task id</label>
+            <input type="text" class="form-control" name="task-id" required placeholder="Please enter task-id">
+        </div>
+        <button type="submit" class="btn btn-success">Close task</button>
+    </form>
+</div>
+/<div class="container">
+    <h2>Task getting</h2>
+    <form action="/get-my-tasks" method="POST">
+        <div class="form-group">
+            <label for="jwt-token">JWT</label>
+            <input type="text" class="form-control" name="jwt-token" required placeholder="Please enter your jwt token">
+        </div>
+        <button type="submit" class="btn btn-success">Get my tasks</button>
+    </form>
+</div>
+</body>
+</html>
