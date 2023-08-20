@@ -37,6 +37,7 @@ func (h *UseCase) CreateUser(ctx context.Context, name, role, pass string) (stri
 
 	createdUser, err := h.repo.Insert(ctx, models.User{
 		ID:        uuid.New(),
+		PublicID:  uuid.New(),
 		Name:      name,
 		Role:      role,
 		Password:  pass,
@@ -50,9 +51,7 @@ func (h *UseCase) CreateUser(ctx context.Context, name, role, pass string) (stri
 	if err != nil {
 		return "", fmt.Errorf("cant create event %w", err)
 	}
-	// публикуем созданного пользователя в аутбокс, в рамках учебного проекта сразу в кафку
-	// аутбокс предпочтительнее потому что мы сохраним транзакционность при записи в БД
-	// но это проект про верхнеуровневую архитектуру а не про правильный код :smile:
+
 	err = h.kafkaClient.ProduceSync(ctx, &event).FirstErr()
 	if err != nil {
 		return "", fmt.Errorf("cant publish event %w", err)

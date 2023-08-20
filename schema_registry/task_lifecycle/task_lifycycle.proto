@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package schema_registry;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "schema_registry/task_lifecycle";
+
+// CUD событие генерируемое при создание/изменении задачи
+message Event {
+  string id = 1;
+  string public_id = 2;
+  string user_id = 3;
+  string name = 4;
+  // закладываемся под передачу номера джира тикета
+  optional string jira_id = 5;
+  int64 fee = 6;
+  int64 cost = 7;
+  string description = 8;
+  optional google.protobuf.Timestamp closed_at = 9;
+}
+

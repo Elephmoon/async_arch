@@ -1,18 +1,18 @@
 package main
 
 import (
+	"accounting/internal/config"
+	"accounting/internal/pkg/handlers"
+	"accounting/internal/pkg/kafka_consumers"
+	"accounting/internal/pkg/kafka_handlers"
 	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"task-tracker/internal/config"
-	"task-tracker/internal/pkg/handlers"
-	"task-tracker/internal/pkg/kafka_consumers"
-	"task-tracker/internal/pkg/kafka_handlers"
 )
 
 const (
-	port = 8082
+	port = 8083
 )
 
 func main() {
@@ -27,17 +27,20 @@ func main() {
 		log.Fatal(err)
 	}
 	defer kafkaClient.Close()
+	pricingKafkaClient, err := config.NewKafkaClientWithConsumer(ctx, "task-pricing")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer pricingKafkaClient.Close()
 
 	httpService := handlers.NewService(db, kafkaClient)
 
-	http.HandleFunc("/", httpService.MainPage)
-	http.HandleFunc("/create-task", httpService.CreateTask)
-	http.HandleFunc("/close-task", httpService.CloseTask)
-	http.HandleFunc("/shuffle-tasks", httpService.Shuffle)
-	http.HandleFunc("/get-my-tasks", httpService.GetMyTasks)
+	http.HandleFunc("/close-day", httpService.CloseDay)
 
 	usersHandler := kafka_handlers.NewUsersKafkaHandler(db)
+	taskPricingHandler := kafka_handlers.NewTaskPricingKafkaHandler(db, kafkaClient)
 	kafka_consumers.MustCreateUsersKafkaConsumer(ctx, kafkaClient, usersHandler.Handle)
+	kafka_consumers.MustCreateUsersKafkaConsumer(ctx, pricingKafkaClient, taskPricingHandler.Handle)
 
 	log.Printf("Server is running at %d port.\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))

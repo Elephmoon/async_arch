@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package schema_registry;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "schema_registry/user_lifecycle";
+
+// событие генерируемое при каких либо изменениях в пользовательских данных
+message Event {
+  string id = 1;
+  string public_id = 2;
+  string name = 3;
+  string role = 4;
+  optional google.protobuf.Timestamp deleted_at = 5;
+}

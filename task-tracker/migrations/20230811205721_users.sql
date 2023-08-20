@@ -2,10 +2,10 @@
 -- +goose StatementBegin
 CREATE TABLE users (
     id uuid not null primary key,
+    public_id uuid not null primary key,
     name text not null unique,
     role text not null,
     created_at timestamptz not null,
-    synced_at timestamptz not null,
     deleted_at timestamptz
 );
 -- +goose StatementEnd

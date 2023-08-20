@@ -74,10 +74,10 @@ func (h *Tasks) CloseTask(ctx context.Context, taskID uuid.UUID) (models.Task, e
 
 func (h *Tasks) CreateTask(ctx context.Context, task models.Task) error {
 	const sqlQuery = `
-		insert into tasks (id, name, description, user_id, price, fee)
-		values ($1, $2, $3, $4, $5, $6)
+		insert into tasks (id, name, description, user_id, price, fee, public_id)
+		values ($1, $2, $3, $4, $5, $6, $7)
 	`
-	_, err := h.db.Exec(ctx, sqlQuery, task.ID, task.Name, task.Description, task.UserID, task.Cost, task.Fee)
+	_, err := h.db.Exec(ctx, sqlQuery, task.ID, task.Name, task.Description, task.UserID, task.Cost, task.Fee, task.PublicID)
 
 	return err
 }

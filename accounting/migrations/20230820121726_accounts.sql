@@ -1,15 +1,13 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE tasks (
-    id uuid not null,
+CREATE TABLE accounts (
+    number text not null primary key,
     public_id uuid not null,
-    name text not null,
-    description text not null,
     user_id uuid not null,
-    price bigint not null default 0,
-    fee bigint not null default 0,
+    user_public_id uuid not null,
+    balance bigint not null default 0,
     created_at timestamptz not null default now(),
-    closed_at timestamptz
+    unique (user_id, public_id)
 );
 -- +goose StatementEnd
 

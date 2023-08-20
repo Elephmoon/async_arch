@@ -15,9 +15,9 @@ func NewUser(db *pgx.Conn) *User {
 }
 
 func (h *User) Insert(ctx context.Context, user models.User) (models.User, error) {
-	const sqlQuery = `insert into users (id, name, password, role, created_at) values($1, $2, $3, $4, $5)`
+	const sqlQuery = `insert into users (id, name, password, role, created_at, public_id) values($1, $2, $3, $4, $5, $6)`
 
-	_, err := h.db.Exec(ctx, sqlQuery, user.ID, user.Name, user.Password, user.Role, user.CreatedAt)
+	_, err := h.db.Exec(ctx, sqlQuery, user.ID, user.Name, user.Password, user.Role, user.CreatedAt, user.PublicID)
 
 	return user, err
 }
