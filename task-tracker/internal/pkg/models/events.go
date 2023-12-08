@@ -1,35 +1,22 @@
 package models
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/twmb/franz-go/pkg/kgo"
-	"time"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"task-tracker/schema_registry/task_lifecycle"
+	"task-tracker/schema_registry/task_pricing"
 )
 
-type KafkaUserEvent struct {
-	ID        uuid.UUID  `json:"id"`
-	Name      string     `json:"name"`
-	Role      string     `json:"role"`
-	CreatedAt time.Time  `json:"createdAt"`
-	DeletedAt *time.Time `json:"deletedAt"`
-}
-
-type TaskPricingEvent struct {
-	TaskID         uuid.UUID `json:"task_id"`
-	IdempotencyKey uuid.UUID `json:"idempotency_key"`
-	UserID         uuid.UUID `json:"user_id"`
-	Cost           int64     `json:"cost"`
-}
-
 func NewTaskPricingEvent(taskID, userID uuid.UUID, cost int64) (kgo.Record, error) {
-	event := TaskPricingEvent{
-		TaskID:         taskID,
-		IdempotencyKey: uuid.New(),
-		UserID:         userID,
+	event := task_pricing.Event{
+		TaskId:         taskID.String(),
+		UserId:         userID.String(),
 		Cost:           cost,
+		IdempotencyKey: uuid.NewString(),
 	}
-	eventJson, err := json.Marshal(event)
+	eventJson, err := protojson.Marshal(&event)
 	if err != nil {
 		return kgo.Record{}, err
 	}
@@ -40,35 +27,30 @@ func NewTaskPricingEvent(taskID, userID uuid.UUID, cost int64) (kgo.Record, erro
 	}, nil
 }
 
-type TaskEvent struct {
-	TaskID      uuid.UUID  `json:"task_id"`
-	UserID      uuid.UUID  `json:"user_id"`
-	Name        string     `json:"name"`
-	Fee         int64      `json:"fee"`
-	Cost        int64      `json:"cost"`
-	Description string     `json:"description"`
-	CreatedAt   time.Time  `json:"created_at"`
-	ClosedAt    *time.Time `json:"closed_at,omitempty"`
-}
-
 func NewTaskEvent(task Task) (kgo.Record, error) {
-	event := TaskEvent{
-		TaskID:      task.ID,
-		UserID:      task.UserID,
+	var closedAt *timestamppb.Timestamp
+	if task.ClosedAt != nil {
+		closedAt = timestamppb.New(*task.ClosedAt)
+	}
+	event := task_lifecycle.Event{
+		Id:          task.ID.String(),
+		PublicId:    task.PublicID.String(),
+		UserId:      task.UserID.String(),
 		Name:        task.Name,
+		JiraId:      nil,
 		Fee:         task.Fee,
 		Cost:        task.Cost,
 		Description: task.Description,
-		CreatedAt:   task.CreatedAt,
-		ClosedAt:    task.ClosedAt,
+		ClosedAt:    closedAt,
 	}
 
-	jsonEvent, err := json.Marshal(event)
+	eventJson, err := protojson.Marshal(&event)
 	if err != nil {
 		return kgo.Record{}, err
 	}
+
 	return kgo.Record{
 		Key:   task.ID[:],
-		Value: jsonEvent,
+		Value: eventJson,
 	}, nil
 }

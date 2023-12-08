@@ -67,6 +67,7 @@ func (h *UseCase) CreateTask(ctx context.Context, userName, taskName, descriptio
 	fee, price := calcTaskFeePrice()
 	task := models.Task{
 		ID:          taskID,
+		PublicID:    uuid.New(),
 		UserID:      user.ID,
 		Name:        taskName,
 		Description: description,
@@ -80,10 +81,6 @@ func (h *UseCase) CreateTask(ctx context.Context, userName, taskName, descriptio
 		return uuid.UUID{}, err
 	}
 
-	// todo в правильном мире нужно складывать сообщение
-	//  в аутбокс для сохранения транзакционности и асинхронных
-	//  походов во внешний сервис
-	// в рамках курса делаем допущения и пишем сразу в кафку
 	err = h.publishAssigneeTaskEvents(ctx, task)
 	if err != nil {
 		return uuid.UUID{}, err

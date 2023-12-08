@@ -1,14 +1,19 @@
 package models
 
 import (
-	"encoding/json"
+	"auth/schema_registry/user_lifecycle"
 	"github.com/google/uuid"
 	"github.com/twmb/franz-go/pkg/kgo"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
+const userLifecycleTopicName = "user-lifecycle"
+
 type User struct {
 	ID        uuid.UUID
+	PublicID  uuid.UUID
 	Name      string
 	Role      string
 	CreatedAt time.Time
@@ -16,31 +21,27 @@ type User struct {
 	Password  string
 }
 
-type KafkaUserEvent struct {
-	ID        uuid.UUID  `json:"id"`
-	Name      string     `json:"name"`
-	Role      string     `json:"role"`
-	CreatedAt time.Time  `json:"createdAt"`
-	DeletedAt *time.Time `json:"deletedAt"`
-}
-
 func NewKafkaUserEvent(user User) (kgo.Record, error) {
-	event := KafkaUserEvent{
-		ID:        user.ID,
+	var deletedAt *timestamppb.Timestamp
+	if user.DeletedAt != nil {
+		deletedAt = timestamppb.New(*user.DeletedAt)
+	}
+	userEvent := user_lifecycle.Event{
+		Id:        user.ID.String(),
+		PublicId:  user.PublicID.String(),
 		Name:      user.Name,
 		Role:      user.Role,
-		CreatedAt: user.CreatedAt,
-		DeletedAt: user.DeletedAt,
+		DeletedAt: deletedAt,
 	}
 
-	payload, err := json.Marshal(event)
+	pl, err := protojson.Marshal(&userEvent)
 	if err != nil {
 		return kgo.Record{}, err
 	}
 
 	return kgo.Record{
 		Key:   user.ID[:],
-		Value: payload,
-		Topic: "auth-users-info",
+		Value: pl,
+		Topic: userLifecycleTopicName,
 	}, nil
 }

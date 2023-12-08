@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package schema_registry;
+
+option go_package = "schema_registry/accounting_audit_log";
+
+// CUD событие аудит лога аккаунтинга
+message Event {
+  string id = 1;
+  string event_type = 2;
+  string account_number = 3;
+  optional string task_id = 4;
+  int64 change_amount = 5;
+}

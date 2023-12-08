@@ -7,6 +7,7 @@ import (
 
 type Task struct {
 	ID          uuid.UUID
+	PublicID    uuid.UUID
 	UserID      uuid.UUID
 	Name        string
 	Description string

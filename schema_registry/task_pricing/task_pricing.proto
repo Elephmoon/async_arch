@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package schema_registry;
+
+option go_package = "schema_registry/task_pricing";
+
+
+// бизнес событие генерируемое при назначении/закрытии задачи
+message Event {
+  string task_id = 1;
+  string user_id = 3;
+  int64 cost = 4;
+  string idempotency_key = 5;
+}

@@ -36,6 +36,11 @@ func (h *Service) CreateTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "taskName is empty", http.StatusBadRequest)
 		return
 	}
+	if strings.Contains(taskName, "[") || strings.Contains(taskName, "]") {
+		http.Error(w, "task name contains jira_id", http.StatusBadRequest)
+		return
+	}
+
 	taskDescription := r.Form.Get("task-description")
 	if strings.TrimSpace(taskDescription) == "" {
 		http.Error(w, "taskDescription is empty", http.StatusBadRequest)

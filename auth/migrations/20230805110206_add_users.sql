@@ -2,6 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE users (
     id uuid not null primary key,
+    public_id uuid not null primary key,
     name text not null unique,
     password text not null,
     role text not null,
